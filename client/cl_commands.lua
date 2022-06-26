@@ -35,3 +35,8 @@ RegisterCommand("carry",function(source, args)
 		carry.targetSrc = 0
 	end
 end, false)
+
+-- Tackle
+RegisterCommand('+Tackle', Tackle, false)
+RegisterCommand('-Tackle', function() end, false)
+RegisterKeyMapping('+Tackle', 'Tackle another player', 'keyboard', 'E')

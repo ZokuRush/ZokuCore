@@ -14,16 +14,19 @@ function DrawText3D(coords, text)
     DrawRect(_x,_y+0.0125, 0.002+ factor, 0.03, 0, 0, 0, 100)
 end
 
--- Animation Loader
-local function ensureAnimDict(animDict)
-    if not HasAnimDictLoaded(animDict) then
-        RequestAnimDict(animDict)
-        while not HasAnimDictLoaded(animDict) do
-            Wait(0)
-        end
-    end
-    return animDict
-end
+-- Discord Rich Presence
+Citizen.CreateThread(function()
+	while true do
+		SetDiscordAppId(App ID Here)
+		SetDiscordRichPresenceAsset('Pic 1')
+        SetDiscordRichPresenceAssetText('Text 1')
+        SetDiscordRichPresenceAssetSmall('Pic 2')
+        SetDiscordRichPresenceAssetSmallText('Text 2')
+        SetDiscordRichPresenceAction(0, "Text 1", "Link 1")
+        SetDiscordRichPresenceAction(1, "Text 2", "link 2")
+		Citizen.Wait(60000)
+	end
+end)
 
 -- Disable Hud Components
 Citizen.CreateThread(function()
@@ -102,6 +105,17 @@ Citizen.CreateThread(function()
 		end
 	end
 end)
+
+-- Animation Loader
+local function ensureAnimDict(animDict)
+    if not HasAnimDictLoaded(animDict) then
+        RequestAnimDict(animDict)
+        while not HasAnimDictLoaded(animDict) do
+            Wait(0)
+        end
+    end
+    return animDict
+end
 
 -- Hands Up
 Citizen.CreateThread(function()
@@ -427,4 +441,55 @@ Citizen.CreateThread(function()
 			end
 		end
 	end
+end)
+
+-- Tackle
+local _tackleDuration = 1500 -- In milliseconds
+
+function GetTouchedPlayers()
+    local players = {}
+
+    local ped = PlayerPedId()
+
+    for _, playerId in ipairs(GetActivePlayers()) do
+        if IsEntityTouchingEntity(ped, GetPlayerPed(playerId)) then table.insert(players, playerId) end
+    end
+
+    return players
+end
+
+function Tackle()
+    local ped = PlayerPedId()
+
+    if IsPedOnFoot(ped) then
+        if IsPedJumping(ped) then
+            local forwardVector = GetEntityForwardVector(ped)
+
+            SetPedToRagdollWithFall(ped, _tackleDuration, 2000, 0, forwardVector, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+
+            Citizen.CreateThread(
+                function()
+                    local tackled = {}
+
+                    while IsPedRagdoll(ped) do
+                        local justTackledServierIds = {}
+
+                        for _, playerId in ipairs(GetTouchedPlayers()) do
+                            if not tackled[playerId] then
+                                tackled[playerId] = true
+                                table.insert(justTackledServierIds, GetPlayerServerId(playerId))
+                            end
+                        end
+
+                        if #justTackledServierIds > 0 then TriggerServerEvent('Tackle:Server:TacklePlayer', justTackledServierIds, forwardVector) end
+                        Wait(0)
+                    end
+                end)
+        end
+    end
+end
+
+RegisterNetEvent('Tackle:Client:TacklePlayer')
+AddEventHandler('Tackle:Client:TacklePlayer', function(forwardVector)
+    SetPedToRagdollWithFall(PlayerPedId(), _tackleDuration, _tackleDuration, 0, forwardVector, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
 end)
