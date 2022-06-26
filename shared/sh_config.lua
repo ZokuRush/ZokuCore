@@ -2,7 +2,6 @@ Config = {}
 
 -- Removable Items (On Use)
 Config.Removeables = {
-	RepairKit = false,
 	O2Tank = true
 }
 
