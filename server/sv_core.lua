@@ -52,8 +52,8 @@ AddEventHandler('playerDropped', function(reason)
 end)
 
 -- O2 Tank
-RegisterNetEvent('esx_extraitems:removeoxygentank')
-AddEventHandler('esx_extraitems:removeoxygentank', function()
+RegisterNetEvent('ZokuCore:removeoxygentank')
+AddEventHandler('ZokuCore:removeoxygentank', function()
 	local _source = source
 	local xPlayer = ESX.GetPlayerFromId(_source)
 	if Config.Removeables.O2Tank then
