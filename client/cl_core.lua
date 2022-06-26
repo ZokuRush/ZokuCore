@@ -14,6 +14,17 @@ function DrawText3D(coords, text)
     DrawRect(_x,_y+0.0125, 0.002+ factor, 0.03, 0, 0, 0, 100)
 end
 
+-- Animation Loader
+local function ensureAnimDict(animDict)
+    if not HasAnimDictLoaded(animDict) then
+        RequestAnimDict(animDict)
+        while not HasAnimDictLoaded(animDict) do
+            Wait(0)
+        end
+    end
+    return animDict
+end
+
 -- Disable Hud Components
 Citizen.CreateThread(function()
     while true do
@@ -158,16 +169,6 @@ local function GetClosestPlayer(radius)
 	else
 		return nil
 	end
-end
-
-local function ensureAnimDict(animDict)
-    if not HasAnimDictLoaded(animDict) then
-        RequestAnimDict(animDict)
-        while not HasAnimDictLoaded(animDict) do
-            Wait(0)
-        end
-    end
-    return animDict
 end
 
 RegisterNetEvent("CarryPeople:syncTarget")
